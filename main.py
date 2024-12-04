@@ -55,6 +55,25 @@ def next_fit(weights, capacity):
 
     return len(warehouse.get_bins())
 
+def generate_uneven_distribution(n, size):
+    result = []
+    if n < 4:
+        for _ in range(size):
+            result.append(n)
+        return result
+    for _ in range(size):
+        dist = random.random()
+        if dist < 0.60:  # 60% probability
+            # Generate a number in the lower range
+            result.append(random.randint(1, n // 4))
+        elif dist < 0.85:  # 25% probability
+            result.append(random.randint(n // 4 + 1, n // 2))
+        elif dist < 0.95:  # 10% probability
+            result.append(random.randint(n // 2 + 1, 3 * n // 4))
+        else:
+            result.append(random.randint(3 * n // 4 + 1, n))
+
+    return result
 
 def main():
     print("Hello World")
