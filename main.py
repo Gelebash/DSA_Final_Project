@@ -426,7 +426,70 @@ def result_screen(screen, nt, nb, ft, fb):
         pygame.display.update()
 
 def main():
-    print("Hello World")
+    pygame.init()
+    screen = pygame.display.set_mode((910, 720))
+    pygame.display.set_caption("Bin Sorting")
+
+    home_screen_opened = False
+    running = True
+    backToResult = False
+    data_received = False
+
+    while running:
+        if not backToResult:
+            if not home_screen_opened:
+                # Display the home screen
+                home_screen(screen)
+                home_screen_opened = True
+
+            if not data_received:
+                # Draw the parameter input screen and get user inputs
+                parameters = draw_parameter_screen(screen)
+
+                # If parameters are valid, proceed with the trials and results
+                if parameters:
+                    next_times, next_bins, first_times, first_bins = [], [], [], []
+
+                    for _ in range(5):
+                        weights = generate_uneven_distribution(parameters[1], parameters[0])
+
+                        # Next Fit Algorithm
+                        start_time = time.time()
+                        next_trial = next_fit(weights, parameters[2])
+                        end_time = time.time()
+                        next_times.append(round(end_time - start_time, 5))
+                        next_bins.append(next_trial)
+
+                        # First Fit Algorithm
+                        start_time = time.time()
+                        first_trial = first_fit(weights, parameters[2], parameters[1])
+                        end_time = time.time()
+                        first_times.append(round(end_time - start_time, 5))
+                        first_bins.append(first_trial)
+                data_received = True
+
+                # After the trials, show the result screen
+            bin_data = result_screen(screen, next_times, next_bins, first_times, first_bins)
+
+            if bin_data[0] == "restart":
+                home_screen_opened = False
+                data_received = False
+            else:
+                backToResult = bin_data[0]
+                draw_bin(screen, bin_data[1], bin_data[2], bin_data[3])
+        else:
+            result_screen(screen, next_times, next_bins, first_times, first_bins)
+            backToResult = False
+
+        # Main event loop for quitting the game
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        pygame.display.update()
+
+    pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":
