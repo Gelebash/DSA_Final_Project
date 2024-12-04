@@ -89,7 +89,7 @@ def home_screen(screen):
     screen.blit(bg, (0, 0))
 
     # Create the title text
-    title_text = start_title_font.render("Bin Sorting", True, (255, 255, 255))  # Title text
+    title_text = start_title_font.render("Bin Packaging", True, (255, 255, 255))  # Title text
 
     # Create a semi-transparent background for the title text
     title_surface = pygame.Surface((title_text.get_width() + 20, title_text.get_height() + 20), pygame.SRCALPHA)
