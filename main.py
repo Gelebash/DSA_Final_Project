@@ -230,7 +230,56 @@ def draw_parameter_screen(screen):
             y_offset += 40  # Move down for the next line
 
         pygame.display.update()
+        
+def draw_bin(screen, t, b, number):
+    # Initialize fonts
+    title_font = pygame.font.Font(None, 80)
+    result_font = pygame.font.Font(None, 40)
+    button_font = pygame.font.Font(None, 60)
 
+    # Fill screen with background color
+    screen.fill((255, 255, 255))
+
+    # Title text
+    title_text = title_font.render(f"Bin {number + 1} Stats", True, (0, 0, 0))
+    title_rect = title_text.get_rect(center=(screen.get_width() // 2, 50))
+    screen.blit(title_text, title_rect)
+
+    # Display bin data
+    bin_data = [
+        f"Time: {t} seconds",
+        f"Bins: {b} bins",
+    ]
+
+    # Positioning variables
+    y_offset = 150
+    spacing = 50
+
+    for data in bin_data:
+        bin_text = result_font.render(data, True, (0, 0, 0))
+        screen.blit(bin_text, (screen.get_width() // 2 - bin_text.get_width() // 2, y_offset))
+        y_offset += spacing
+
+    # Draw the back button
+    back_text = button_font.render("Back", True, (255, 255, 255))
+    back_surface = pygame.Surface(back_text.get_size(), pygame.SRCALPHA)
+    back_surface.fill((0, 0, 0, 180))
+    back_surface.blit(back_text, (0, 0))
+    back_rect = back_surface.get_rect(center=(screen.get_width() // 2, y_offset + 100))
+    screen.blit(back_surface, back_rect)
+
+    # Main event loop for navigating the screen
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            # Check for mouse clicks on the back button
+            if event.type == pygame.MOUSEBUTTONDOWN and back_rect.collidepoint(event.pos):
+                return  # Go back to the result screen when the back button is clicked
+
+        pygame.display.update()
 
 def main():
     print("Hello World")
