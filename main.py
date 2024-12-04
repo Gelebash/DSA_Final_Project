@@ -281,6 +281,150 @@ def draw_bin(screen, t, b, number):
 
         pygame.display.update()
 
+def result_screen(screen, nt, nb, ft, fb):
+    # Initialize fonts
+    title_font = pygame.font.Font(None, 80)
+    column_font = pygame.font.Font(None, 60)
+    result_font = pygame.font.Font(None, 40)
+    button_font = pygame.font.Font(None, 60)
+
+    # Fill screen with background color
+    screen.fill((255, 255, 255))
+
+    # Title text
+    title_text = title_font.render("Results", True, (0, 0, 0))
+    title_rect = title_text.get_rect(center=(screen.get_width() // 2, 50))
+    screen.blit(title_text, title_rect)
+
+    # Calculate averages
+    avg_first_time = round(sum(ft) / len(ft), 4)
+    avg_first_bins = round(sum(fb) / len(fb), 4) // 1
+    avg_next_time = round(sum(nt) / len(nt), 4)
+    avg_next_bins = round(sum(nb) / len(nb), 4) // 1
+    avg_time_ratio = round(avg_first_time / avg_next_time, 4)
+    avg_bin_ratio = round(avg_first_bins / avg_next_bins, 4)
+
+    # Column headers
+    first_fit_text = column_font.render("First Fit", True, (0, 0, 0))
+    next_fit_text = column_font.render("Next Fit", True, (0, 0, 0))
+    screen.blit(first_fit_text, (200, 150))
+    screen.blit(next_fit_text, (550, 150))  # Shifted right
+
+    # Results display
+    first_fit_data = [
+        f"Avg Time: {avg_first_time} seconds",
+        f"Avg Bins: {int(avg_first_bins)} bins",
+    ]
+    next_fit_data = [
+        f"Avg Time: {avg_next_time} seconds",
+        f"Avg Bins: {int(avg_next_bins)} bins",
+    ]
+
+    # Positioning variables
+    y_offset = 230
+    spacing = 50
+
+    # Displaying the results
+    for first, next_ in zip(first_fit_data, next_fit_data):
+        first_text = result_font.render(first, True, (0, 0, 0))
+        next_text = result_font.render(next_, True, (0, 0, 0))
+        screen.blit(first_text, (75, y_offset))
+        screen.blit(next_text, (480, y_offset))  # Shifted right
+        y_offset += spacing
+
+
+    time_ratio = result_font.render(f"Time Ratio: {avg_time_ratio}", True, (0, 0, 0))
+    bin_ratio = result_font.render(f"Bin Ratio: {avg_bin_ratio}", True, (0, 0, 0))
+    screen.blit(time_ratio, (75, y_offset + 10))
+    screen.blit(bin_ratio, (480, y_offset + 10))
+
+    # Draw vertical line between columns
+    pygame.draw.line(screen, (0, 0, 0), (455, 150), (455, y_offset), 3)  # Vertical line
+
+    # Draw horizontal lines between rows
+    pygame.draw.line(screen, (0, 0, 0), (50, 200), (screen.get_width() - 50, 200), 3)  # Top line
+    pygame.draw.line(screen, (0, 0, 0), (50, y_offset), (screen.get_width() - 50, y_offset), 3) # Bottom line
+
+    # Increase y_offset for bin buttons to avoid overlap
+    button_y_offset = y_offset + 100
+
+    button_width = 120  # Button width
+    button_height = 50  # Button height
+
+    # Create buttons for First Fit (Bins 1-5)
+    first_fit_buttons = []
+    for i in range(5):
+        button_text = button_font.render(f"Bin {i + 1}", True, (255, 255, 255))
+        button_surface = pygame.Surface(button_text.get_size(), pygame.SRCALPHA)
+        button_surface.fill((0, 0, 0, 180))
+        button_surface.blit(button_text, (0, 0))
+
+        # Calculate the button's position
+        row_offset = i // 3  # To determine which row the button will be in (0 for the first row, 1 for the second, etc.)
+        column_offset = i % 3  # To determine the column in the row (0, 1, 2)
+
+        button_rect = button_surface.get_rect(
+            center=(100 + column_offset * button_width,
+                    button_y_offset + row_offset * button_height)
+        )
+
+        screen.blit(button_surface, button_rect)
+        first_fit_buttons.append(button_rect)
+
+
+    # Create buttons for Next Fit (Bins 6-10)
+    next_fit_buttons = []
+    for i in range(5):
+        button_text = button_font.render(f"Bin {i+1}", True, (255, 255, 255))
+        button_surface = pygame.Surface(button_text.get_size(), pygame.SRCALPHA)
+        button_surface.fill((0, 0, 0, 180))
+        button_surface.blit(button_text, (0, 0))
+
+        # Calculate the button's position for "Next Fit" bins
+        row_offset = i // 3  # To determine which row the button will be in (0 for the first row, 1 for the second, etc.)
+        column_offset = i % 3  # To determine the column in the row (0, 1, 2)
+
+        button_rect = button_surface.get_rect(
+            center=(500 + column_offset * button_width,
+                    button_y_offset + row_offset * button_height)
+        )
+
+        screen.blit(button_surface, button_rect)
+        next_fit_buttons.append(button_rect)
+
+    # Draw a button to go back to the home screen or quit
+    back_text = button_font.render("Restart", True, (255, 255, 255))
+    back_surface = pygame.Surface(back_text.get_size(), pygame.SRCALPHA)
+    back_surface.fill((0, 0, 0, 180))
+    back_surface.blit(back_text, (0, 0))
+    back_rect = back_surface.get_rect(center=(screen.get_width() // 2, button_y_offset + 200))
+    screen.blit(back_surface, back_rect)
+
+    # Main event loop for navigating the screen
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            # Check for mouse clicks on First Fit bin buttons
+            for i, button_rect in enumerate(first_fit_buttons):
+                if event.type == pygame.MOUSEBUTTONDOWN and button_rect.collidepoint(event.pos):
+                    # Pass the corresponding time and bin count for First Fit
+                    return [True, ft[i], fb[i], i]
+
+            # Check for mouse clicks on Next Fit bin buttons
+            for i, button_rect in enumerate(next_fit_buttons):
+                if event.type == pygame.MOUSEBUTTONDOWN and button_rect.collidepoint(event.pos):
+                    # Pass the corresponding time and bin count for Next Fit
+                    return [True, nt[i], nb[i], i]
+
+            # Check for mouse clicks on the back button
+            if event.type == pygame.MOUSEBUTTONDOWN and back_rect.collidepoint(event.pos):
+                return ["restart"]  # Exit the result screen and return to the previous screen
+
+        pygame.display.update()
+
 def main():
     print("Hello World")
 
