@@ -241,7 +241,7 @@ def draw_bin(screen, t, b, number):
     screen.fill((255, 255, 255))
 
     # Title text
-    title_text = title_font.render(f"Bin {number + 1} Stats", True, (0, 0, 0))
+    title_text = title_font.render(f"Run {number + 1} Stats", True, (0, 0, 0))
     title_rect = title_text.get_rect(center=(screen.get_width() // 2, 50))
     screen.blit(title_text, title_rect)
 
@@ -354,7 +354,7 @@ def result_screen(screen, nt, nb, ft, fb):
     # Create buttons for First Fit (Bins 1-5)
     first_fit_buttons = []
     for i in range(5):
-        button_text = button_font.render(f"Bin {i + 1}", True, (255, 255, 255))
+        button_text = button_font.render(f"Run {i + 1}", True, (255, 255, 255))
         button_surface = pygame.Surface(button_text.get_size(), pygame.SRCALPHA)
         button_surface.fill((0, 0, 0, 180))
         button_surface.blit(button_text, (0, 0))
@@ -375,7 +375,7 @@ def result_screen(screen, nt, nb, ft, fb):
     # Create buttons for Next Fit (Bins 6-10)
     next_fit_buttons = []
     for i in range(5):
-        button_text = button_font.render(f"Bin {i+1}", True, (255, 255, 255))
+        button_text = button_font.render(f"Run {i+1}", True, (255, 255, 255))
         button_surface = pygame.Surface(button_text.get_size(), pygame.SRCALPHA)
         button_surface.fill((0, 0, 0, 180))
         button_surface.blit(button_text, (0, 0))
