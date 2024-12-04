@@ -135,6 +135,103 @@ def home_screen(screen):
 
         pygame.display.update()
 
+def draw_parameter_screen(screen):
+    pygame.font.init()
+    title_font = pygame.font.Font(None, 100)
+    input_font = pygame.font.Font(None, 50)
+    label_font = pygame.font.Font(None, 40)
+    error_font = pygame.font.Font(None, 35)
+
+    screen.fill((255, 255, 255))
+
+    # Title
+    title_text = title_font.render("Data Input", True, (0, 0, 0))
+    title_rectangle = title_text.get_rect(center=(screen.get_width() // 2, 100))
+    screen.blit(title_text, title_rectangle)
+
+    # Input fields and labels
+    labels = ["Number of Items", "Max Weight", "Bin Capacity"]
+    label_x = 50  # X position for labels
+    input_boxes = [pygame.Rect(300, 200 + i * 100, 200, 50) for i in range(3)]
+    inputs = ["", "", ""]  # To store text for each input field
+    active_box = None  # To track the currently active box
+
+    errors = []  # List to store error messages, persists between frames
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            # Mouse click: Detect active input box
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for i, box in enumerate(input_boxes):
+                    if box.collidepoint(event.pos):
+                        active_box = i
+                        break
+                else:
+                    active_box = None  # Deselect all boxes if clicked outside
+
+            # Handle keyboard input
+            if event.type == pygame.KEYDOWN and active_box is not None:
+                if event.key == pygame.K_RETURN:
+                    # Reset errors and validate inputs
+                    errors.clear()
+                    try:
+                        # Convert inputs to integers
+                        num_items = int(inputs[0]) if inputs[0] else 0
+                        max_weight = int(inputs[1]) if inputs[1] else 0
+                        bin_capacity = int(inputs[2]) if inputs[2] else 0
+
+                        # Validate constraints
+                        if num_items < 100000 or num_items > 500000:
+                            errors.append("Number of Items must be between")
+                            errors.append("100,000 and 500,000.")
+                        if max_weight < 1:
+                            errors.append("Max Weight must be at least 1.")
+                        if bin_capacity < max_weight:
+                            errors.append("Bin Capacity must be at least Max Weight.")
+
+                        # If no errors, return the valid inputs as a tuple
+                        if not errors:
+                            return num_items, max_weight, bin_capacity
+
+                    except ValueError:
+                        errors.append("All fields must be valid integers.")
+
+                elif event.key == pygame.K_BACKSPACE:
+                    inputs[active_box] = inputs[active_box][:-1]
+                else:
+                    inputs[active_box] += event.unicode
+
+        # Draw screen elements
+        screen.fill((255, 255, 255))
+        screen.blit(title_text, title_rectangle)
+
+        for i, (label, box, input_text) in enumerate(zip(labels, input_boxes, inputs)):
+            # Draw labels
+            label_surface = label_font.render(label, True, (0, 0, 0))
+            screen.blit(label_surface, (label_x, box.y + 10))  # Place labels to the left of boxes
+
+            # Draw input box
+            color = (0, 128, 255) if active_box == i else (200, 200, 200)
+            pygame.draw.rect(screen, color, box, 2)
+
+            # Draw input text
+            text_surface = input_font.render(input_text, True, (0, 0, 0))
+            screen.blit(text_surface, (box.x + 5, box.y + 10))
+
+        # Display error messages
+        y_offset = 500  # Shift errors a little lower so they're more centered
+        for error in errors:
+            error_surface = error_font.render(error, True, (255, 0, 0))
+            screen.blit(error_surface, (50, y_offset))
+            y_offset += 40  # Move down for the next line
+
+        pygame.display.update()
+
+
 def main():
     print("Hello World")
 
